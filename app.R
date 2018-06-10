@@ -9,6 +9,7 @@
 library(shiny)
 library(ggplot2)
 library(DT)
+library(shinycssloaders)
 
 source("download_currency_data.R")
 
@@ -36,20 +37,16 @@ ui <- fluidPage(
       ),
       
       mainPanel(
-        plotOutput("priceChart"),
+        withSpinner(DT::dataTableOutput("conversions")),
         h3(textOutput("price")),
         h3(textOutput("total")),
-        DT::dataTableOutput("conversions")
-        
+        plotOutput("priceChart")
       )
    )
 )
 
 # Define server logic required to show prices and transactions
 server <- function(input, output) {
-  
-  # Default values 
-  #conversions <- get_conversions(input$input_amount, input$input_currency)
   
    # Render currency price chart for last 7 days
   output$priceChart <- renderPlot({
@@ -83,7 +80,7 @@ server <- function(input, output) {
    
    # Run calculations when button is pressed
    conversions <- eventReactive(input$calculate, {
-     get_conversions(input$input_amount, input$input_currency)
+       get_conversions(input$input_amount, input$input_currency)
    })
    
    # Render table of possible conversions from STEEM/SBD to USD
