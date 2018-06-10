@@ -36,6 +36,7 @@ ui <- fluidPage(
       
       mainPanel(
         h3(textOutput("price")),
+        h3(textOutput("total")),
         plotOutput("priceChart")
       )
    )
@@ -61,6 +62,15 @@ server <- function(input, output) {
        print_currency_price(get_usd_price("steem"), "STEEM")
      }
    })
+   
+   output$total <- renderText({ 
+     if (input$input_currency == "sbd"){
+       print_currency_total(get_usd_price("sbd"), input$input_amount, "SBD")
+     }
+     else if (input$input_currency == "steem"){
+       print_currency_total(get_usd_price("steem"), input$input_amount, "STEEM")
+     }
+   })
 }
 
 # Utility function to make price chart
@@ -75,6 +85,12 @@ plot_currency_price_week <- function(data, currency){
 # Utility function to format price string
 print_currency_price <- function(price, currency){
   paste0(currency, " Price: $", sprintf("%.2f", price))
+}
+
+# Utility function to format price string
+print_currency_total <- function(price, amount, currency){
+  total <- sprintf("%.2f", amount*price)
+  paste0("USD Total: $", total, " (", amount, " @ $",sprintf("%.2f", price), ")")
 }
 
 # Run the application 
