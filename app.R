@@ -84,9 +84,14 @@ server <- function(input, output) {
    })
    
    # Render table of possible conversions from STEEM/SBD to USD
-   output$conversions = DT::renderDataTable({
-     conversions()
-   })
+   output$conversions = DT::renderDataTable(datatable(conversions(), 
+                                            rownames = FALSE, 
+                                            options = list(order = 
+                                                      list(list(0, 'desc'))))
+                                            %>% formatCurrency(c("amount"), 
+                                                               digits=2))
+     
+
 }
 
 # Utility function to make price chart
