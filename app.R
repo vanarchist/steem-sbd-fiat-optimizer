@@ -8,6 +8,7 @@
 
 library(shiny)
 library(ggplot2)
+library(DT)
 
 source("download_currency_data.R")
 
@@ -35,25 +36,32 @@ ui <- fluidPage(
       ),
       
       mainPanel(
+        plotOutput("priceChart"),
         h3(textOutput("price")),
         h3(textOutput("total")),
-        plotOutput("priceChart")
+        DT::dataTableOutput("conversions")
+        
       )
    )
 )
 
 # Define server logic required to show prices and transactions
 server <- function(input, output) {
+  
+  # Default values 
+  #conversions <- get_conversions(input$input_amount, input$input_currency)
+  
+   # Render currency price chart for last 7 days
+  output$priceChart <- renderPlot({
+    if (input$input_currency == "steem"){
+      plot_currency_price_week(get_chart_data("steem"), "STEEM")
+    }
+    else if(input$input_currency == "sbd"){
+      plot_currency_price_week(get_chart_data("sbd"), "SBD")
+    }
+  })
    
-   output$priceChart <- renderPlot({
-     if (input$input_currency == "steem"){
-       plot_currency_price_week(get_chart_data("steem"), "STEEM")
-     }
-     else if(input$input_currency == "sbd"){
-       plot_currency_price_week(get_chart_data("sbd"), "SBD")
-     }
-   })
-   
+   # Render currency current price
    output$price <- renderText({ 
      if (input$input_currency == "sbd"){
        print_currency_price(get_usd_price("sbd"), "SBD")
@@ -63,6 +71,7 @@ server <- function(input, output) {
      }
    })
    
+   # Render total in USD
    output$total <- renderText({ 
      if (input$input_currency == "sbd"){
        print_currency_total(get_usd_price("sbd"), input$input_amount, "SBD")
@@ -70,6 +79,16 @@ server <- function(input, output) {
      else if (input$input_currency == "steem"){
        print_currency_total(get_usd_price("steem"), input$input_amount, "STEEM")
      }
+   })
+   
+   # Run calculations when button is pressed
+   conversions <- eventReactive(input$calculate, {
+     get_conversions(input$input_amount, input$input_currency)
+   })
+   
+   # Render table of possible conversions from STEEM/SBD to USD
+   output$conversions = DT::renderDataTable({
+     conversions()
    })
 }
 
