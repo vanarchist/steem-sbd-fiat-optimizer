@@ -10,12 +10,13 @@ library(shiny)
 library(ggplot2)
 library(DT)
 library(shinycssloaders)
+library(shinyjs)
 
 source("download_currency_data.R")
 
 # Define UI for application
 ui <- fluidPage(
-   
+   useShinyjs(),
    # Application title
    titlePanel("STEEM/SBD To Fiat Conversion Optimizer"),
    
@@ -30,9 +31,10 @@ ui <- fluidPage(
                     c("USD" = "usd")),
         selectInput("target_exchange", "Target Exchange:",
                     c("GDAX" = "gdax")),
-        checkboxGroupInput("conversion_exchanges", "Conversion Exchanges:",
+        disabled(checkboxGroupInput("conversion_exchanges", 
+                                    "Conversion Exchanges:",
                            c("blocktrades" = "blocktrades"),
-                           selected = "blocktrades"),
+                           selected = "blocktrades")),
         actionButton("calculate", "Calculate", class = "btn-primary")
       ),
       
