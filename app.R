@@ -107,11 +107,13 @@ plot_currency_price_week <- function(data, currency){
 
 # Utility function to format price string
 print_currency_price <- function(price, currency){
+  price <- round_any(price, accuracy=.01, f=floor)
   paste0(currency, " Price: $", sprintf("%.2f", price))
 }
 
 # Utility function to format price string
 print_currency_total <- function(price, amount, currency){
+  price <- round_any(price, accuracy=.01, f=floor)
   total <- sprintf("%.2f", amount*price)
   paste0("USD Total: $", total, " (", amount, " @ $",sprintf("%.2f", price), ")")
 }
