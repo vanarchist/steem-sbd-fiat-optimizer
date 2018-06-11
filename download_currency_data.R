@@ -1,5 +1,6 @@
 # Functions to download required currency data from various websites 
-# and exchanges
+# and exchanges. Also calculation functions. Should probably be using
+# exact representations for money quantities but for now we're not.
 
 library(jsonlite)
 library(rgdax)
