@@ -72,11 +72,18 @@ get_conversions <- function(input_amount, input_currency){
   btrades_sbd_ltc <- get_blocktrades_output_amt(sbd_amount, "sbd", "ltc")
   btrades_sbd_eth <- get_blocktrades_output_amt(sbd_amount, "sbd", "eth")
   
+  # Binance supports BTC and ETH STEEM trading pairs
+  binance_steem_btc <- get_binance_output_amt(steem_amount, "steem", "btc")
+  binance_steem_eth <- get_binance_output_amt(steem_amount, "steem", "eth")
+  
   # Form dataframe will all conversions
   steem_btc_usd_amt <- as.double(btrades_steem_btc)*as.double(gdax_btc$price)
   steem_bch_usd_amt <- as.double(btrades_steem_bch)*as.double(gdax_bch$price)
   steem_ltc_usd_amt <- as.double(btrades_steem_ltc)*as.double(gdax_ltc$price)
   steem_eth_usd_amt <- as.double(btrades_steem_eth)*as.double(gdax_eth$price)
+  
+  bin_steem_btc_usd_amt <- binance_steem_btc*as.double(gdax_btc$price)
+  bin_steem_eth_usd_amt <- binance_steem_eth*as.double(gdax_eth$price)
   
   sbd_btc_usd_amt <- as.double(btrades_sbd_btc)*as.double(gdax_btc$price)
   sbd_bch_usd_amt <- as.double(btrades_sbd_bch)*as.double(gdax_bch$price)
@@ -95,7 +102,8 @@ get_conversions <- function(input_amount, input_currency){
   data <- data.frame(c(steem_btc_usd_amt, steem_bch_usd_amt,
                        steem_ltc_usd_amt, steem_eth_usd_amt,
                        sbd_btc_usd_amt, sbd_bch_usd_amt,
-                       sbd_ltc_usd_amt, sbd_eth_usd_amt),
+                       sbd_ltc_usd_amt, sbd_eth_usd_amt,
+                       bin_steem_btc_usd_amt, bin_steem_eth_usd_amt),
                      c(paste0(steem_insert, "Blocktrades[STEEM -> BTC], ",
                               "GDAX[BTC -> USD]"),
                        paste0(steem_insert, "Blocktrades[STEEM -> BCH], ",
@@ -111,6 +119,10 @@ get_conversions <- function(input_amount, input_currency){
                        paste0(sbd_insert, "Blocktrades[SBD -> LTC], ",
                               "GDAX[LTC -> USD]"),
                        paste0(sbd_insert, "Blocktrades[SBD -> ETH], ",
+                              "GDAX[ETH -> USD]"),
+                       paste0(steem_insert, "Binance[STEEM -> BTC], ",
+                              "GDAX[BTC -> USD]"),
+                       paste0(steem_insert, "Binance[STEEM -> ETH], ",
                               "GDAX[ETH -> USD]")
                        ))
   colnames(data) <- c("amount", "transactions")
@@ -141,4 +153,19 @@ get_blocktrades_output_amt <- function(input_amount, input_currency,
                 "&outputCoinType=", output_currency, "&sessionToken=", session_token)
   data <- fromJSON(url)
   data$outputAmount
+}
+
+# Get Binance conversion rate (only STEEM)
+get_binance_output_amt <- function(input_amount, input_currency,
+                                   output_currency){
+  if (input_currency != "steem"){
+    stop("Unsupported currency")
+  }
+  
+  symbol <- paste0("STEEM", toupper(output_currency))
+  url <- paste0("https://api.binance.com/api/v3/ticker/price?symbol=",
+                symbol)
+  data <- fromJSON(url)
+  price <- as.double(data$price)
+  input_amount*price
 }

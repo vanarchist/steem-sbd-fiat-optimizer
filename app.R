@@ -11,6 +11,7 @@ library(ggplot2)
 library(DT)
 library(shinycssloaders)
 library(shinyjs)
+library(plyr)
 
 source("download_currency_data.R")
 
@@ -33,8 +34,9 @@ ui <- fluidPage(
                     c("GDAX" = "gdax")),
         disabled(checkboxGroupInput("conversion_exchanges", 
                                     "Conversion Exchanges:",
-                           c("blocktrades" = "blocktrades"),
-                           selected = "blocktrades")),
+                           c("blocktrades" = "blocktrades",
+                             "binance" = "binance"),
+                           selected = c("blocktrades", "binance"))),
         actionButton("calculate", "Calculate", class = "btn-primary")
       ),
       
