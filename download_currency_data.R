@@ -82,8 +82,22 @@ get_conversions <- function(input_amount, input_currency){
   steem_ltc_usd_amt <- as.double(btrades_steem_ltc)*as.double(gdax_ltc$price)
   steem_eth_usd_amt <- as.double(btrades_steem_eth)*as.double(gdax_eth$price)
   
-  bin_steem_btc_usd_amt <- binance_steem_btc*as.double(gdax_btc$price)
-  bin_steem_eth_usd_amt <- binance_steem_eth*as.double(gdax_eth$price)
+  # Binance 
+  # No deposit fee
+  # 0.1% trade fee
+  # Withdraw fee variable
+  bin_fees <- scrape_binance_fees()
+  
+  # Withdraw fee
+  bin_btc_withdraw_fee <- bin_fees$transactionFee[bin_fees$assetCode == "BTC"]
+  bin_eth_withdraw_fee <- bin_fees$transactionFee[bin_fees$assetCode == "ETH"]
+  
+  # 0.1% trade fee
+  bin_steem_btc_fee <-binance_steem_btc-(binance_steem_btc*0.001)
+  bin_steem_eth_fee <-binance_steem_eth-(binance_steem_eth*0.001)
+  
+  bin_steem_btc_usd_amt <- (bin_steem_btc_fee-bin_btc_withdraw_fee)*as.double(gdax_btc$price)
+  bin_steem_eth_usd_amt <- (bin_steem_eth_fee-bin_eth_withdraw_fee)*as.double(gdax_eth$price)
   
   sbd_btc_usd_amt <- as.double(btrades_sbd_btc)*as.double(gdax_btc$price)
   sbd_bch_usd_amt <- as.double(btrades_sbd_bch)*as.double(gdax_bch$price)
@@ -169,3 +183,10 @@ get_binance_output_amt <- function(input_amount, input_currency,
   price <- as.double(data$price)
   input_amount*price
 }
+
+# Get Binance withdraw fees
+scrape_binance_fees <- function() {
+  fees <- fromJSON("https://www.binance.com/assetWithdraw/getAllAsset.html")
+}
+
+
