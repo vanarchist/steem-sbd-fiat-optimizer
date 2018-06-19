@@ -7,7 +7,7 @@ There is not yet a market for directly using earned STEEM or SBD to make purchas
 ## Screenshot
 
 The screenshot below shows possible transactions listed in order of highest resulting amount
-![Screenshot](https://i.imgur.com/aJgM8xk.jpg)
+![Screenshot](https://i.imgur.com/pGmP2Rf.png)
 
 ## Roadmap
 
